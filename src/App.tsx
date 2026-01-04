@@ -1,12 +1,44 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import './App.css';
 import { useProducts } from './hooks/useProducts';
 import ProductList from './components/ProductList';
+import Filters from './components/Filters';
 import type { Product, CartItem } from './types';
 
 function App() {
   const { products, loading, error } = useProducts();
   const [cart, setCart] = useState<CartItem[]>([]);
+  
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [sortOrder, setSortOrder] = useState('');
+
+  const categories = useMemo(() => {
+    const cats = products.map(p => p.category);
+    return [...new Set(cats)];
+  }, [products]);
+
+  const filteredProducts = useMemo(() => {
+    let result = [...products];
+
+    if (searchTerm) {
+      result = result.filter(p =>
+        p.title.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (selectedCategory) {
+      result = result.filter(p => p.category === selectedCategory);
+    }
+
+    if (sortOrder === 'low-high') {
+      result.sort((a, b) => a.price - b.price);
+    } else if (sortOrder === 'high-low') {
+      result.sort((a, b) => b.price - a.price);
+    }
+
+    return result;
+  }, [products, searchTerm, selectedCategory, sortOrder]);
 
   const handleAddToCart = (product: Product) => {
     setCart(prevCart => {
@@ -27,6 +59,12 @@ function App() {
     });
   };
 
+  const handleClearFilters = () => {
+    setSearchTerm('');
+    setSelectedCategory('');
+    setSortOrder('');
+  };
+
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
@@ -40,8 +78,18 @@ function App() {
       
       <main className="main-content">
         <section className="products-section">
+          <Filters
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+            categories={categories}
+            sortOrder={sortOrder}
+            onSortChange={setSortOrder}
+            onClearFilters={handleClearFilters}
+          />
           <ProductList
-            products={products}
+            products={filteredProducts}
             loading={loading}
             error={error}
             onAddToCart={handleAddToCart}
