@@ -1,0 +1,22 @@
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.products-loading,
+.products-error,
+.products-empty {
+  text-align: center;
+  padding: 40px;
+  background: #fff;
+  border-radius: 8px;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.products-error {
+  color: #e74c3c;
+  background: #fdf2f2;
+}
+
