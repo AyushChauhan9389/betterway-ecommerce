@@ -3,6 +3,7 @@ import './App.css';
 import { useProducts } from './hooks/useProducts';
 import ProductList from './components/ProductList';
 import Filters from './components/Filters';
+import Cart from './components/Cart';
 import type { Product, CartItem } from './types';
 
 function App() {
@@ -59,6 +60,20 @@ function App() {
     });
   };
 
+  const handleUpdateQuantity = (productId: number, newQuantity: number) => {
+    setCart(prevCart => 
+      prevCart.map(item =>
+        item.product.id === productId
+          ? { ...item, quantity: newQuantity }
+          : item
+      )
+    );
+  };
+
+  const handleRemoveItem = (productId: number) => {
+    setCart(prevCart => prevCart.filter(item => item.product.id !== productId));
+  };
+
   const handleClearFilters = () => {
     setSearchTerm('');
     setSelectedCategory('');
@@ -96,21 +111,11 @@ function App() {
           />
         </section>
         <aside className="cart-section">
-          <div className="cart-container">
-            <h2>Your Cart</h2>
-            {cart.length === 0 ? (
-              <p className="empty-cart">Your cart is empty</p>
-            ) : (
-              <ul className="cart-items">
-                {cart.map(item => (
-                  <li key={item.product.id} className="cart-item">
-                    <span>{item.product.title}</span>
-                    <span>x{item.quantity}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          <Cart
+            items={cart}
+            onUpdateQuantity={handleUpdateQuantity}
+            onRemoveItem={handleRemoveItem}
+          />
         </aside>
       </main>
     </div>
