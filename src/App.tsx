@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'react';
 import './App.css';
 import { useProducts } from './hooks/useProducts';
+import { useDebounce } from './hooks/useDebounce';
+import { useLocalStorage } from './hooks/useLocalStorage';
 import ProductList from './components/ProductList';
 import Filters from './components/Filters';
 import Cart from './components/Cart';
@@ -8,11 +10,13 @@ import type { Product, CartItem } from './types';
 
 function App() {
   const { products, loading, error } = useProducts();
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const [cart, setCart] = useLocalStorage<CartItem[]>('shopeasy-cart', []);
   
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [sortOrder, setSortOrder] = useState('');
+
+  const debouncedSearch = useDebounce(searchTerm, 300);
 
   const categories = useMemo(() => {
     const cats = products.map(p => p.category);
@@ -22,9 +26,9 @@ function App() {
   const filteredProducts = useMemo(() => {
     let result = [...products];
 
-    if (searchTerm) {
+    if (debouncedSearch) {
       result = result.filter(p =>
-        p.title.toLowerCase().includes(searchTerm.toLowerCase())
+        p.title.toLowerCase().includes(debouncedSearch.toLowerCase())
       );
     }
 
@@ -39,7 +43,7 @@ function App() {
     }
 
     return result;
-  }, [products, searchTerm, selectedCategory, sortOrder]);
+  }, [products, debouncedSearch, selectedCategory, sortOrder]);
 
   const handleAddToCart = (product: Product) => {
     setCart(prevCart => {
