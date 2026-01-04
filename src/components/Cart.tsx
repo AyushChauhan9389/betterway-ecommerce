@@ -1,5 +1,5 @@
 import type { CartItem } from '../types';
-import './Cart.css';
+import '../styles/Cart.css';
 
 interface Props {
   items: CartItem[];

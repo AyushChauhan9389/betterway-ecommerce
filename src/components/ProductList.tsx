@@ -1,15 +1,16 @@
 import type { Product } from '../types';
 import ProductCard from './ProductCard';
-import './ProductList.css';
+import '../styles/ProductList.css';
 
 interface Props {
   products: Product[];
   loading: boolean;
   error: string | null;
   onAddToCart: (product: Product) => void;
+  onViewProduct: (product: Product) => void;
 }
 
-function ProductList({ products, loading, error, onAddToCart }: Props) {
+function ProductList({ products, loading, error, onAddToCart, onViewProduct }: Props) {
   if (loading) {
     return <div className="products-loading">Loading products...</div>;
   }
@@ -29,6 +30,7 @@ function ProductList({ products, loading, error, onAddToCart }: Props) {
           key={product.id} 
           product={product} 
           onAddToCart={onAddToCart}
+          onViewProduct={onViewProduct}
         />
       ))}
     </div>
@@ -36,4 +38,3 @@ function ProductList({ products, loading, error, onAddToCart }: Props) {
 }
 
 export default ProductList;
-

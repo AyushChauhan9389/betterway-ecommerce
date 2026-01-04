@@ -1,4 +1,4 @@
-import './Filters.css';
+import '../styles/Filters.css';
 
 interface Props {
   searchTerm: string;

@@ -1,11 +1,12 @@
 import { useState, useMemo } from 'react';
-import './App.css';
+import './styles/App.css';
 import { useProducts } from './hooks/useProducts';
 import { useDebounce } from './hooks/useDebounce';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import ProductList from './components/ProductList';
 import Filters from './components/Filters';
 import Cart from './components/Cart';
+import ProductPopup from './components/ProductPopup';
 import type { Product, CartItem } from './types';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [sortOrder, setSortOrder] = useState('');
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const debouncedSearch = useDebounce(searchTerm, 300);
 
@@ -84,6 +86,14 @@ function App() {
     setSortOrder('');
   };
 
+  const handleViewProduct = (product: Product) => {
+    setSelectedProduct(product);
+  };
+
+  const handleClosePopup = () => {
+    setSelectedProduct(null);
+  };
+
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
@@ -112,6 +122,7 @@ function App() {
             loading={loading}
             error={error}
             onAddToCart={handleAddToCart}
+            onViewProduct={handleViewProduct}
           />
         </section>
         <aside className="cart-section">
@@ -122,6 +133,14 @@ function App() {
           />
         </aside>
       </main>
+
+      {selectedProduct && (
+        <ProductPopup
+          product={selectedProduct}
+          onClose={handleClosePopup}
+          onAddToCart={handleAddToCart}
+        />
+      )}
     </div>
   );
 }
